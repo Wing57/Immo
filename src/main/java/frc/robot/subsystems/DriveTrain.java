@@ -12,11 +12,17 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Settings;
 
 public class DriveTrain extends SubsystemBase {
 
@@ -40,6 +46,10 @@ public class DriveTrain extends SubsystemBase {
   private final double rampRate;
 
   private final DifferentialDrive drive;
+
+  private final DifferentialDriveOdometry m_Odometry;
+
+  private final Field2d field;
 
   private final AHRS navX;
 
@@ -96,11 +106,117 @@ public class DriveTrain extends SubsystemBase {
 
     navX = new AHRS(SPI.Port.kMXP);
 
-    
+    m_Odometry = new DifferentialDriveOdometry(navX.getRotation2d());
+    field = new Field2d();
+    resetOdometry(Settings.STARTING_POSITION);
+
+    // Put field on the spot RUHEUHEUHEHE
+    SmartDashboard.putData("Field", field);
+  }
+
+  // *****************************************
+  // ************** Encoders *****************
+  // *****************************************
+
+  //TODO: Figure out if native unit conversion is needed
+  public double getLeftDistance() {
+    return leftEncoder.getPosition();
+  }
+
+  public double getRightDistance() {
+    return rightEncoder.getPosition();
+  }
+
+  public double getDistance() {
+    return (getLeftDistance() + getRightDistance()) / 2.0;
+  }
+
+  // Velocity
+  public double getLeftVelocity() {
+    return leftEncoder.getVelocity();
+  }
+
+  public double getRightVelocity() {
+    return rightEncoder.getVelocity();
+  }
+
+  public double getVelocity() {
+    return (getLeftVelocity() + getRightVelocity()) / 2.0;
+  }
+
+  // Reset
+  public void resetEncoders() {
+    leftEncoder.setPosition(0);
+    rightEncoder.setPosition(0);
+  }
+
+  // *****************************************
+  // ************* Robot Angle ***************
+  // *****************************************
+
+  public double getRawGyroAngle() {
+    return navX.getAngle();
+  }
+
+  //TODO: test that the angle stuff checks out
+  public double getGyroAngle() {
+    return navX.getAngle() % 360;
+  }
+
+  public double getHeading() {
+    return navX.getRotation2d().getDegrees();
+  }
+
+  public Rotation2d getRotation2d() {
+    return navX.getRotation2d();
+  }
+
+  public void zeroHeading() {
+    navX.reset();
+  }
+
+  // ********************************************
+  // ************ Odometry Functions ************
+  // ********************************************
+
+  public void updateOdometry() {
+    m_Odometry.update(
+      getRotation2d(), 
+      getLeftDistance(), 
+      getRightDistance()
+    );
+  }
+
+  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
+    return new DifferentialDriveWheelSpeeds(
+      getLeftVelocity(), 
+      getRightVelocity()
+      );
+  }
+
+  public Pose2d getPose() {
+    updateOdometry();
+    return m_Odometry.getPoseMeters();
+  }
+
+  public Field2d getField() {
+    return field;
+  }
+
+  public void resetOdometry(Pose2d pose2d) {
+    resetEncoders();
+    zeroHeading();
+
+    m_Odometry.resetPosition(pose2d, getRotation2d());
+  }
+
+  public void reset() {
+    resetOdometry(getPose());
   }
 
   @Override
   public void periodic() {
-
+    updateOdometry();
+    field.setRobotPose(getPose());
   }
 }
