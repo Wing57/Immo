@@ -1,6 +1,11 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2022.4.1"
+    id 'com.diffplug.spotless' version '6.11.0'
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
@@ -51,6 +56,8 @@ dependencies {
     implementation wpi.java.deps.wpilib()
     implementation wpi.java.vendor.java()
 
+    implementation 'com.github.rambots:rampage:v2022.10.2'
+
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)
     roborioDebug wpi.java.vendor.jniDebug(wpi.platforms.roborio)
 
@@ -72,6 +79,24 @@ dependencies {
 wpi.sim.addGui().defaultEnabled = true
 wpi.sim.addDriverstation()
 
+def updateGitHooks = tasks.register('updateGitHooks', Copy) {
+    from './scripts/pre-commit'
+    into './.git/hooks'
+}
+
+def changePermission = tasks.register('changePermission', Exec) {
+    commandLine('chmod',  '+x', './.git/hooks/pre-commit')
+}
+
+changePermission.configure {
+    mustRunAfter updateGitHooks
+}
+
+compileJava {
+    dependsOn 'updateGitHooks'
+    dependsOn 'spotlessApply'
+}
+
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
@@ -85,3 +110,19 @@ jar {
 deployArtifact.jarTask = jar
 wpi.java.configureExecutableTasks(jar)
 wpi.java.configureTestTasks(test)
+
+spotless {
+    java {
+        target fileTree('.') {
+            include '**/*.java'
+            exclude '**/build/**', '**/build-*/**'
+        }
+        ratchetFrom 'HEAD'
+        toggleOffOn()
+        googleJavaFormat()
+        importOrder('com.rambots4571', 'edu.wpi')
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
