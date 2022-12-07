@@ -9,7 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
 public final class Constants {
-    
+
   // *****************************************
   // ********** DRIVE TRAIN ******************
   // *****************************************
@@ -21,6 +21,9 @@ public final class Constants {
     public static final int RIGHT_MOTOR_1 = 4;
     public static final int RIGHT_MOTOR_2 = 5;
     public static final int RIGHT_MOTOR_3 = 6;
+
+    // TODO: Find the actual gear ratio
+    public static final double kGearRatio = 15.32;
   }
 
   public static final class Settings {
@@ -28,9 +31,5 @@ public final class Constants {
     public static final Rotation2d STARTING_ANGLE = new Rotation2d();
 
     public static final Pose2d STARTING_POSITION = new Pose2d(STARTING_TRANSLATION, STARTING_ANGLE);
-  }
-
-  public static final class MotorConfig {
-      
   }
 }
