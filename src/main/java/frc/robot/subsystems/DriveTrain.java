@@ -28,6 +28,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Settings;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class DriveTrain extends SubsystemBase {
 
@@ -43,7 +44,7 @@ public class DriveTrain extends SubsystemBase {
   private final boolean rightMotorInvert, leftMotorInvert;
 
   private final int currentLimit;
-  private final double rampRate;
+  private double rampRate;
 
   private final DifferentialDrive drive;
   private final DifferentialDriveOdometry m_Odometry;
@@ -301,8 +302,33 @@ public class DriveTrain extends SubsystemBase {
   public void periodic() {
     updateOdometry();
     field.setRobotPose(getPose());
+
+    SmartDashboard.putNumber("dd", getPose().getX());
   }
 
   @Override
-  public void initSendable(SendableBuilder builder) {}
+  public void initSendable(SendableBuilder builder) {
+    super.initSendable(builder);
+    builder.addDoubleProperty("Angle", this::getGyroAngle, null);
+    builder.addDoubleProperty(
+        "ramp rate",
+        () -> rampRate,
+        r -> {
+          System.out.println("setting ramp rate");
+          rampRate = r;
+          allMotors.forEach(motor -> {motor.setClosedLoopRampRate(r);});
+        });
+    
+    builder.addDoubleProperty("Left Side Voltage", this::getLeftVoltage, null);
+    builder.addDoubleProperty("Right Side Voltage", this::getRightVoltage, null);
+    builder.addDoubleProperty("Voltage", this::getBatteryVoltage, null);
+
+    builder.addDoubleProperty("Left Velocity", this::getLeftVelocity, null);
+    builder.addDoubleProperty("Right Velocity", this::getRightVelocity, null);
+    builder.addDoubleProperty("Velocity", this::getVelocity, null);
+
+    builder.addDoubleProperty("Left Distance Traveled", this::getLeftDistance, null);
+    builder.addDoubleProperty("Right Distance Traveled", this::getRightDistance, null);
+    builder.addDoubleProperty("Distance Traveled", this::getDistance, null);
+  }
 }
