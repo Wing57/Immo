@@ -1,6 +1,6 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project. GOD I HATE JAVAHOME
+// the WPILib BSD license file in the root directory of this project. GOD I HATE JAVAHOME I still hate javahome but DARIUS is the GOAT
 
 package frc.robot.subsystems;
 
@@ -28,7 +28,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Settings;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class DriveTrain extends SubsystemBase {
 
