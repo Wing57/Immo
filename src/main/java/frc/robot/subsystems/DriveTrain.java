@@ -113,8 +113,8 @@ public class DriveTrain extends SubsystemBase {
     leftEncoder = leftMaster.getEncoder();
     rightEncoder = rightMaster.getEncoder();
 
-    leftEncoder.setPositionConversionFactor(DriveConstants.kGearRatio);
-    rightEncoder.setPositionConversionFactor(DriveConstants.kGearRatio);
+    leftEncoder.setPositionConversionFactor(DriveConstants.POSITION_CONVERSION_FACTOR);
+    rightEncoder.setPositionConversionFactor(DriveConstants.VELOCITY_CONVERSION_FACTOR);
 
     leftEncoder.setInverted(leftMotorInvert);
     rightEncoder.setInverted(rightMotorInvert);
@@ -129,7 +129,6 @@ public class DriveTrain extends SubsystemBase {
 
     // Put field on the spot RUHEUHEUHEHE
     SmartDashboard.putData("Field", field);
-
   }
 
   // *****************************************

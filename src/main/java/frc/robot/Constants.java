@@ -24,6 +24,10 @@ public final class Constants {
 
     // TODO: Find the actual gear ratio
     public static final double kGearRatio = 15.32;
+    public static final double kWheelWheelRadiusInch = 3.0;
+
+    public static final double POSITION_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI * kWheelWheelRadiusInch));
+    public static final double VELOCITY_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI *kWheelWheelRadiusInch) * (1/60));
   }
 
   public static final class Settings {
