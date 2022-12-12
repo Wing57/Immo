@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project. GOD I HATE JAVAHOME I still hate javahome but DARIUS is the GOAT
 
-package frc.robot.subsystems;
+package frc.robot.subsystems.driveTrain;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
@@ -26,10 +26,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Settings;
+import frc.robot.subsystems.IDriveTrain;
+
 import java.util.Arrays;
 import java.util.List;
 
-public class DriveTrain extends SubsystemBase {
+public class DriveTrain extends IDriveTrain {
 
   private final List<CANSparkMax> allMotors;
 

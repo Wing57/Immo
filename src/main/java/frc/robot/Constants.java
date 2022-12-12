@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
@@ -26,8 +27,13 @@ public final class Constants {
     public static final double kGearRatio = 15.32;
     public static final double kWheelWheelRadiusInch = 3.0;
 
+    public static final int kEncoderResolution = 8192;
+
     public static final double POSITION_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI * kWheelWheelRadiusInch));
     public static final double VELOCITY_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI *kWheelWheelRadiusInch) * (1/60));
+
+    public static final double kEncoderDPP =
+        (Units.inchesToMeters(kWheelWheelRadiusInch * 2) * Math.PI) / (double) kEncoderResolution;
   }
 
   public static final class Settings {
