@@ -4,9 +4,16 @@
 
 package frc.robot;
 
+import com.rambots4571.rampage.joystick.Controller;
+import com.rambots4571.rampage.joystick.Gamepad;
+
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.Settings;
 
 public class RobotContainer {
+
+  public static final Controller<Gamepad.Button, Gamepad.Axis> driveController =
+    Gamepad.make(Settings.driveController);
 
   public RobotContainer() {
     // Configure the button bindings

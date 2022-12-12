@@ -51,5 +51,7 @@ public final class Constants {
     public static final Rotation2d STARTING_ANGLE = new Rotation2d();
 
     public static final Pose2d STARTING_POSITION = new Pose2d(STARTING_TRANSLATION, STARTING_ANGLE);
+
+    public static final int driveController = 3;
   }
 }
