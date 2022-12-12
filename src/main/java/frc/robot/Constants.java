@@ -34,6 +34,16 @@ public final class Constants {
 
     public static final double kEncoderDPP =
         (Units.inchesToMeters(kWheelWheelRadiusInch * 2) * Math.PI) / (double) kEncoderResolution;
+    
+    /////////////// SYSID VALUES ///////////////
+
+    public static final double kS = 0;
+    public static final double kV = 0;
+    public static final double kA = 0;
+    public static final double kA_Angular = 0;
+    public static final double kV_Angular = 0;
+
+    public static final double kTrackWidthMeters = 0.7551;
   }
 
   public static final class Settings {
