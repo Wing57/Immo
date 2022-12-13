@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -191,33 +190,6 @@ public class DriveTrain extends SubsystemBase {
   public void arcadeDrive(double xSpeed, double zRotation) {
     drive.arcadeDrive(xSpeed, zRotation, false);
     drive.feed();
-  }
-
-  public void curvatureDrive(double xSpeed, double zRotation, double turnSpeed) {
-    // Clamp all inputs to valid values
-    xSpeed = MathUtil.clamp(xSpeed, -1.0, 1.0);
-    zRotation = MathUtil.clamp(zRotation, -1.0, 1.0);
-    turnSpeed = MathUtil.clamp(turnSpeed, 0.0, 1.0);
-
-    // Change turn speed based off of robot speed
-    double turnAdj = Math.max(turnSpeed, Math.abs(xSpeed));
-
-    // Find the speeds of the left and right wheels
-    double leftSpeed = xSpeed + zRotation * turnAdj;
-    double rightSpeed = xSpeed - zRotation * turnAdj;
-
-    // If a wheel goes above 1.0, scale down the other wheels to compensate
-    double scale = Math.max(1.0, Math.max(Math.abs(leftSpeed), Math.abs(rightSpeed)));
-
-    leftSpeed /= scale;
-    rightSpeed /= scale;
-
-    // Feed the inputs to the drivetrain
-    tankDrive(leftSpeed, rightSpeed);
-  }
-
-  public void curvatureDrive(double xSpeed, double zRotation, boolean stationaryTurn) {
-    drive.curvatureDrive(xSpeed, zRotation, stationaryTurn);
   }
 
   public void stopMotors() {
