@@ -1,8 +1,9 @@
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project. GOD I HATE JAVAHOME I still hate javahome but DARIUS is the GOAT
+// the WPILib BSD license file in the root directory of this project. GOD I HATE JAVAHOME I still
+// hate javahome but DARIUS is the GOAT
 
-package frc.robot.subsystems.driveTrain;
+package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANSparkMax;
@@ -11,26 +12,33 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
+import edu.wpi.first.wpilibj.simulation.ADXRS450_GyroSim;
+import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
+import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.Settings;
-import frc.robot.subsystems.IDriveTrain;
-
 import java.util.Arrays;
 import java.util.List;
 
-public class DriveTrain extends IDriveTrain {
+public class DriveTrain extends SubsystemBase {
 
   private final List<CANSparkMax> allMotors;
 
@@ -53,15 +61,27 @@ public class DriveTrain extends IDriveTrain {
 
   private final AHRS navX;
 
+  // SImulation stuff
+
+  private final Encoder leftEncoderFake, rightEncoderFake;
+  private EncoderSim leftEncoderSim, rightEncoderSim;
+
+  private final ADXRS450_Gyro m_gyro;
+  private ADXRS450_GyroSim m_GyroSim;
+
+  public DifferentialDrivetrainSim driveSim;
+
+  private Field2d fieldSim;
+
   public DriveTrain() {
     // NEOs
     leftMaster = new CANSparkMax(DriveConstants.LEFT_MOTOR_1, MotorType.kBrushless);
     leftMotor2 = new CANSparkMax(DriveConstants.LEFT_MOTOR_2, MotorType.kBrushless);
     leftMotor3 = new CANSparkMax(DriveConstants.LEFT_MOTOR_3, MotorType.kBrushless);
 
-    rightMaster = new CANSparkMax(DriveConstants.LEFT_MOTOR_1, MotorType.kBrushless);
-    rightMotor2 = new CANSparkMax(DriveConstants.LEFT_MOTOR_2, MotorType.kBrushless);
-    rightMotor3 = new CANSparkMax(DriveConstants.LEFT_MOTOR_3, MotorType.kBrushless);
+    rightMaster = new CANSparkMax(DriveConstants.RIGHT_MOTOR_1, MotorType.kBrushless);
+    rightMotor2 = new CANSparkMax(DriveConstants.RIGHT_MOTOR_2, MotorType.kBrushless);
+    rightMotor3 = new CANSparkMax(DriveConstants.RIGHT_MOTOR_3, MotorType.kBrushless);
 
     // Motor groups
     leftMotors = new CANSparkMax[] {leftMaster, leftMotor2, leftMotor3};
@@ -117,14 +137,41 @@ public class DriveTrain extends IDriveTrain {
     leftEncoder.setPositionConversionFactor(DriveConstants.POSITION_CONVERSION_FACTOR);
     rightEncoder.setPositionConversionFactor(DriveConstants.VELOCITY_CONVERSION_FACTOR);
 
-    leftEncoder.setInverted(leftMotorInvert);
-    rightEncoder.setInverted(rightMotorInvert);
+    // SIMULATION
+    leftEncoderFake = new Encoder(0, 1, true);
+    rightEncoderFake = new Encoder(2, 3, false);
+
+    leftEncoderFake.reset();
+    rightEncoderFake.reset();
+
+    leftEncoderFake.setDistancePerPulse(DriveConstants.kEncoderDPP);
+    rightEncoderFake.setDistancePerPulse(DriveConstants.kEncoderDPP);
+
+    m_gyro = new ADXRS450_Gyro();
+
+    if (RobotBase.isSimulation()) {
+      driveSim =
+          new DifferentialDrivetrainSim(
+              DriveConstants.kDrivetrainPlant,
+              DriveConstants.kDriveGearbox,
+              DriveConstants.kGearRatio,
+              DriveConstants.kTrackWidthMeters,
+              Units.inchesToMeters(DriveConstants.kWheelWheelRadiusInch),
+              VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005));
+
+      leftEncoderSim = new EncoderSim(leftEncoderFake);
+      rightEncoderSim = new EncoderSim(rightEncoderFake);
+      m_GyroSim = new ADXRS450_GyroSim(m_gyro);
+
+      fieldSim = new Field2d();
+      SmartDashboard.putData("Field Sim", fieldSim);
+    }
 
     // navX init
     navX = new AHRS(SPI.Port.kMXP);
 
     // Odometry init
-    m_Odometry = new DifferentialDriveOdometry(navX.getRotation2d());
+    m_Odometry = new DifferentialDriveOdometry(getRotation2d());
     field = new Field2d();
     resetOdometry(Settings.STARTING_POSITION);
 
@@ -183,10 +230,16 @@ public class DriveTrain extends IDriveTrain {
 
   // TODO: Figure out if native unit conversion is needed
   public double getLeftDistance() {
+    if (RobotBase.isSimulation()) {
+      return leftEncoderFake.getDistance();
+    }
     return leftEncoder.getPosition();
   }
 
   public double getRightDistance() {
+    if (RobotBase.isSimulation()) {
+      return rightEncoderFake.getDistance();
+    }
     return rightEncoder.getPosition();
   }
 
@@ -196,10 +249,16 @@ public class DriveTrain extends IDriveTrain {
 
   // Velocity
   public double getLeftVelocity() {
+    if (RobotBase.isSimulation()) {
+      return leftEncoderFake.getRate();
+    }
     return leftEncoder.getVelocity();
   }
 
   public double getRightVelocity() {
+    if (RobotBase.isSimulation()) {
+      return rightEncoderFake.getRate();
+    }
     return rightEncoder.getVelocity();
   }
 
@@ -223,6 +282,9 @@ public class DriveTrain extends IDriveTrain {
 
   // TODO: test that the angle stuff checks out
   public double getGyroAngle() {
+    if (RobotBase.isSimulation()) {
+      return m_gyro.getAngle() % 360;
+    }
     return navX.getAngle() % 360;
   }
 
@@ -231,6 +293,9 @@ public class DriveTrain extends IDriveTrain {
   }
 
   public Rotation2d getRotation2d() {
+    if (RobotBase.isSimulation()) {
+      return m_gyro.getRotation2d();
+    }
     return navX.getRotation2d();
   }
 
@@ -298,12 +363,29 @@ public class DriveTrain extends IDriveTrain {
     drive.feed();
   }
 
+  public double getDrawnCurrentAmps() {
+    return driveSim.getCurrentDrawAmps();
+  }
+
   @Override
   public void periodic() {
     updateOdometry();
     field.setRobotPose(getPose());
+    fieldSim.setRobotPose(getPose());
+  }
 
-    SmartDashboard.putNumber("dd", getPose().getX());
+  @Override
+  public void simulationPeriodic() {
+    driveSim.setInputs(
+        leftMaster.get() * RobotController.getBatteryVoltage(),
+        rightMaster.get() * RobotController.getBatteryVoltage());
+    driveSim.update(0.02);
+
+    leftEncoderSim.setDistance(driveSim.getLeftPositionMeters());
+    leftEncoderSim.setRate(driveSim.getLeftVelocityMetersPerSecond());
+    rightEncoderSim.setDistance(driveSim.getRightPositionMeters());
+    rightEncoderSim.setRate(driveSim.getRightVelocityMetersPerSecond());
+    m_GyroSim.setAngle(-driveSim.getHeading().getDegrees());
   }
 
   @Override
@@ -316,9 +398,12 @@ public class DriveTrain extends IDriveTrain {
         r -> {
           System.out.println("setting ramp rate");
           rampRate = r;
-          allMotors.forEach(motor -> {motor.setClosedLoopRampRate(r);});
+          allMotors.forEach(
+              motor -> {
+                motor.setClosedLoopRampRate(r);
+              });
         });
-    
+
     builder.addDoubleProperty("Left Side Voltage", this::getLeftVoltage, null);
     builder.addDoubleProperty("Right Side Voltage", this::getRightVoltage, null);
     builder.addDoubleProperty("Voltage", this::getBatteryVoltage, null);

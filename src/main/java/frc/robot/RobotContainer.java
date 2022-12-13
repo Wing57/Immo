@@ -8,21 +8,36 @@ import com.rambots4571.rampage.joystick.Controller;
 import com.rambots4571.rampage.joystick.Gamepad;
 
 import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.Constants.Settings;
+import frc.robot.commands.TankDriveCommand;
+import frc.robot.subsystems.DriveTrain;
 
 public class RobotContainer {
 
+  // Joysticks
   public static final Controller<Gamepad.Button, Gamepad.Axis> driveController =
-    Gamepad.make(Settings.driveController);
+      Gamepad.make(Settings.driveController);
+
+  // Subsystems
+  public final DriveTrain driveTrain;
+
+  // Commands
+  public final TankDriveCommand tankDriveCommand;
 
   public RobotContainer() {
-    // Configure the button bindings
+    // Subsystems
+    driveTrain = new DriveTrain();
+
+    // Commands
+    tankDriveCommand = new TankDriveCommand(driveTrain);
+
+    driveTrain.setDefaultCommand(tankDriveCommand);
+
     configureButtonBindings();
   }
 
-
   private void configureButtonBindings() {}
-
 
   public Command getAutonomousCommand() {
 

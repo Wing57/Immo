@@ -7,6 +7,10 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.numbers.N2;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 
 public final class Constants {
@@ -29,21 +33,37 @@ public final class Constants {
 
     public static final int kEncoderResolution = 8192;
 
-    public static final double POSITION_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI * kWheelWheelRadiusInch));
-    public static final double VELOCITY_CONVERSION_FACTOR = ((1/kGearRatio) * (2 * Math.PI *kWheelWheelRadiusInch) * (1/60));
+    public static final double POSITION_CONVERSION_FACTOR =
+        ((1 / kGearRatio) * (2 * Math.PI * kWheelWheelRadiusInch));
+    public static final double VELOCITY_CONVERSION_FACTOR =
+        ((1 / kGearRatio) * (2 * Math.PI * kWheelWheelRadiusInch) * (1 / 60));
 
     public static final double kEncoderDPP =
         (Units.inchesToMeters(kWheelWheelRadiusInch * 2) * Math.PI) / (double) kEncoderResolution;
-    
+
     /////////////// SYSID VALUES ///////////////
 
-    public static final double kS = 0;
-    public static final double kV = 0;
-    public static final double kA = 0;
-    public static final double kA_Angular = 0;
-    public static final double kV_Angular = 0;
-
     public static final double kTrackWidthMeters = 0.7551;
+
+    /////////////// SIMULATION /////////////////
+
+    public static final double kvVoltSecondsPerRadian = 1.5;
+    public static final double kaVoltSecondsSquaredPerRadian = 0.3;
+    public static final double kvVoltSecondsPerMeter = 3.4335;
+    public static final double kaVoltSecondsSquaredPerMeter = 0.171;
+
+    public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
+        LinearSystemId.identifyDrivetrainSystem(
+            kvVoltSecondsPerMeter,
+            kaVoltSecondsSquaredPerMeter,
+            kvVoltSecondsPerRadian,
+            kaVoltSecondsSquaredPerRadian);
+
+    // Example values only -- use what's on your physical robot!
+    public static final DCMotor kDriveGearbox = DCMotor.getNEO(3);
+
+    // Drivetrain Speed
+    public static final double DRIVETRAINSPEED = 1;
   }
 
   public static final class Settings {
