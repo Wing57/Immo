@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.numbers.N2;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -43,14 +44,19 @@ public final class Constants {
 
     /////////////// SYSID VALUES ///////////////
 
-    public static final double kTrackWidthMeters = 0.7551;
-
-    /////////////// SIMULATION /////////////////
-
     public static final double kvVoltSecondsPerRadian = 1.5;
     public static final double kaVoltSecondsSquaredPerRadian = 0.3;
     public static final double kvVoltSecondsPerMeter = 3.4335;
     public static final double kaVoltSecondsSquaredPerMeter = 0.171;
+    public static final double ksVolts = 0.558;
+    public static final double kPDriveVel = 3.2137;
+
+    public static final double kTrackWidthMeters = 0.7551;
+    public static final DifferentialDriveKinematics kDriveKinematics =
+        new DifferentialDriveKinematics(kTrackWidthMeters);
+
+
+    /////////////// SIMULATION /////////////////
 
     public static final LinearSystem<N2, N2, N2> kDrivetrainPlant =
         LinearSystemId.identifyDrivetrainSystem(
@@ -71,6 +77,9 @@ public final class Constants {
     public static final Rotation2d STARTING_ANGLE = new Rotation2d();
 
     public static final Pose2d STARTING_POSITION = new Pose2d(STARTING_TRANSLATION, STARTING_ANGLE);
+
+    public static final double kRamseteB = 2.0;
+    public static final double kRamseteZeta = 0.7;
 
     public static final int driveController = 3;
   }
