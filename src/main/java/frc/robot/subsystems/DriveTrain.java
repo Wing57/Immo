@@ -200,7 +200,6 @@ public class DriveTrain extends SubsystemBase {
   // ************** Encoders *****************
   // *****************************************
 
-  // TODO: Figure out if native unit conversion is needed
   public double getLeftDistance() {
     if (RobotBase.isSimulation()) {
       return leftEncoderFake.getDistance();
@@ -240,6 +239,11 @@ public class DriveTrain extends SubsystemBase {
 
   // Reset
   public void resetEncoders() {
+    if (RobotBase.isSimulation()) {
+      leftEncoderFake.reset();
+      rightEncoderFake.reset();
+    }
+
     leftEncoder.setPosition(0);
     rightEncoder.setPosition(0);
   }
@@ -272,6 +276,10 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void zeroHeading() {
+    if (RobotBase.isSimulation()) {
+      m_gyro.reset();
+    }
+    
     navX.reset();
   }
 
