@@ -44,6 +44,7 @@ public final class Constants {
 
     /////////////// SYSID VALUES ///////////////
 
+    // TODO: Find the real values for literally everything
     public static final double kvVoltSecondsPerRadian = 1.5;
     public static final double kaVoltSecondsSquaredPerRadian = 0.3;
     public static final double kvVoltSecondsPerMeter = 3.4335;
@@ -55,6 +56,8 @@ public final class Constants {
     public static final DifferentialDriveKinematics kDriveKinematics =
         new DifferentialDriveKinematics(kTrackWidthMeters);
 
+    public static final double kMaxSpeedMetersPerSecond = 3.0;
+    public static final double kMaxAccelerationMetersPerSecondSquared = 4.0;
 
     /////////////// SIMULATION /////////////////
 
