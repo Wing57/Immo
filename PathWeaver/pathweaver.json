@@ -3,7 +3,7 @@
   "exportUnit": "Always Meters",
   "maxVelocity": 3.0,
   "maxAcceleration": 4.0,
-  "trackWidth": 0.7551,
+  "trackWidth": 0.74,
   "gameName": "Rapid React",
-  "outputDir": ""
+  "outputDir": ".."
 }

@@ -35,7 +35,7 @@ public class RobotContainer {
     tankDriveCommand = new TankDriveCommand(driveTrain);
     arcadeDriveCommand = new ArcadeDriveCommand(driveTrain);
 
-    driveTrain.setDefaultCommand(arcadeDriveCommand);
+    driveTrain.setDefaultCommand(tankDriveCommand);
 
     configureButtonBindings();
   }
