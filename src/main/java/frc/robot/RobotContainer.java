@@ -10,6 +10,7 @@ import com.rambots4571.rampage.joystick.Gamepad;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Constants.Settings;
+import frc.robot.commands.auton.FiveBall;
 import frc.robot.commands.drive.ArcadeDriveCommand;
 import frc.robot.commands.drive.TankDriveCommand;
 import frc.robot.subsystems.DriveTrain;
@@ -26,6 +27,7 @@ public class RobotContainer {
   // Commands
   public final TankDriveCommand tankDriveCommand;
   public final ArcadeDriveCommand arcadeDriveCommand;
+  public final FiveBall fiveBall;
 
   public RobotContainer() {
     // Subsystems
@@ -34,6 +36,7 @@ public class RobotContainer {
     // Commands
     tankDriveCommand = new TankDriveCommand(driveTrain);
     arcadeDriveCommand = new ArcadeDriveCommand(driveTrain);
+    fiveBall = new FiveBall(this);
 
     driveTrain.setDefaultCommand(tankDriveCommand);
 
@@ -44,6 +47,6 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
 
-    return null;
+    return fiveBall;
   }
 }
